@@ -13,12 +13,12 @@ public class MyManage {
     private MyOpenHelper myOpenHelper;
     private SQLiteDatabase sqLiteDatabase;
 
-    private static final String user_table = "userTABLE";
-    private static final String column_id = "_id";
-    private static final String column_name = "Name";
-    private static final String column_surname = "Surname";
-    private static final String column_user = "User";
-    private static final String column_password = "Password";
+    public static final String user_table = "userTABLE";
+    public static final String column_id = "_id";
+    public static final String column_name = "Name";
+    public static final String column_surname = "Surname";
+    public static final String column_user = "User";
+    public static final String column_password = "Password";
 
     public MyManage(Context context) {
 
