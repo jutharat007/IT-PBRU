@@ -1,5 +1,6 @@
 package apppbru.jathratinseenan.itpbru;
 
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,13 +23,13 @@ import java.io.IOException;
 
 public class UploadAccount extends AppCompatActivity {
 
-    // Explicit
+    //Explicit
     private TextView inOutTextView, nameTextView;
     private Spinner spinner;
     private EditText editText;
     private String[] loginStrings;
     private int inOutAnInt;
-    private String[] inOutStrings = new String[]{"บัญชีบันทึก รายรับ", "บัญชีบันทึก รายจ่าย"};
+    private String[] inOutStrings = new String[]{"บัญชีบันทึก รายรับ", "บัญขีบันทึก รายจ่าย"};
     private String[] inComeStrings = new String[]{"เงินเดือน", "ล่วงเวลา", "สอนพิเศษ"};
     private String[] outComeStrings = new String[]{"อาหาร", "เดินทาง", "Entertrain", "การศึกษา"};
     private ArrayAdapter<String> stringArrayAdapter;
@@ -39,24 +40,25 @@ public class UploadAccount extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_account);
 
-        // Bind Widget
+        //Bind Widget
         inOutTextView = (TextView) findViewById(R.id.textView6);
         nameTextView = (TextView) findViewById(R.id.textView7);
         spinner = (Spinner) findViewById(R.id.spinner);
         editText = (EditText) findViewById(R.id.editText7);
 
-        // Receive Value From Intent
+        //Receive Value From Intent
         loginStrings = getIntent().getStringArrayExtra("Login");
         inOutAnInt = getIntent().getIntExtra("InOut", 0);
 
-        // Show View
+        //Show View
         inOutTextView.setText(inOutStrings[inOutAnInt]);
-        nameTextView.setText(loginStrings[1] + "  " + loginStrings[2]);
+        nameTextView.setText(loginStrings[1] + " " + loginStrings[2]);
 
-        // Create Spininer
+        // Create Spinner
         createSpinner();
 
-    } // Main Method
+
+    }   // Main Method
 
     private void createSpinner() {
 
@@ -71,38 +73,40 @@ public class UploadAccount extends AppCompatActivity {
                         android.R.layout.simple_list_item_1, outComeStrings);
                 break;
 
-        } // switch
+        }   // switch
 
         spinner.setAdapter(stringArrayAdapter);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                categoryString = findCategory(position);
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                categoryString = findCategory(i);
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+            public void onNothingSelected(AdapterView<?> adapterView) {
                 categoryString = findCategory(0);
             }
         });
 
-    } // Create Spinner
 
-    private String findCategory(int position) {
+
+    }   // createSpinner
+
+    private String findCategory(int i) {
 
         String strResult = null;
 
         switch (inOutAnInt) {
             case 0:
-                strResult = inComeStrings[position];
+                strResult = inComeStrings[i];
                 break;
             case 1:
-                strResult = outComeStrings[position];
+                strResult = outComeStrings[i];
                 break;
         }
 
-        return null;
+        return strResult;
     }
 
     public void clickUpload(View view) {
@@ -112,7 +116,7 @@ public class UploadAccount extends AppCompatActivity {
         if (amountString.equals("")) {
 
             MyAlert myAlert = new MyAlert();
-            myAlert.myDialog(this, "มีช่องว่าง", "ให้กริกจำนวนเงินด้วยค่ะ");
+            myAlert.myDialog(this, "มีช่องว่าง", "ให้กรอกจำนวนเงินด้วย คะ");
 
         } else {
 
@@ -120,13 +124,13 @@ public class UploadAccount extends AppCompatActivity {
 
         }
 
-    } // ClickUpload
+    }   // clickUpload
 
     private void uploadValueToServer() {
 
         Log.d("8June", "ID user ==> " + loginStrings[0]);
         Log.d("8June", "Date ==> " + getIntent().getStringExtra("Date"));
-        Log.d("8June", "In _Out ==> " + inOutAnInt);
+        Log.d("8June", "In_Out ==> " + inOutAnInt);
         Log.d("8June", "Category ==> " + categoryString);
         Log.d("8June", "amount ==> " + amountString);
 
@@ -143,7 +147,7 @@ public class UploadAccount extends AppCompatActivity {
         Request request = builder.url("http://swiftcodingthai.com/pbru2/add_account_master.php")
                 .post(requestBody).build();
         Call call = okHttpClient.newCall(request);
-        call.equals(new Callback() {
+        call.enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
 
@@ -152,14 +156,14 @@ public class UploadAccount extends AppCompatActivity {
             @Override
             public void onResponse(Response response) throws IOException {
                 finish();
-
             }
         });
 
-    }
+
+    }   // uploadValue
 
     public void clickCancel(View view) {
         finish();
-    } // ClickCancel
+    }
 
-} // Main Class
+}   // Main Class

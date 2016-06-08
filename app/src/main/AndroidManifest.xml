@@ -27,7 +27,8 @@
             android:value="@integer/google_play_services_version" />
 
         <activity android:name=".CalendarActivity" />
-        <activity android:name=".UploadAccount"></activity>
+        <activity android:name=".UploadAccount" />
+        <activity android:name=".GraphActivity"></activity>
     </application>
 
 </manifest>
