@@ -2,11 +2,23 @@ package apppbru.jathratinseenan.itpbru;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.squareup.okhttp.Call;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.FormEncodingBuilder;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
+import java.io.IOException;
 
 public class UploadAccount extends AppCompatActivity {
 
@@ -20,6 +32,7 @@ public class UploadAccount extends AppCompatActivity {
     private String[] inComeStrings = new String[]{"เงินเดือน", "ล่วงเวลา", "สอนพิเศษ"};
     private String[] outComeStrings = new String[]{"อาหาร", "เดินทาง", "Entertrain", "การศึกษา"};
     private ArrayAdapter<String> stringArrayAdapter;
+    private String categoryString, amountString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +75,88 @@ public class UploadAccount extends AppCompatActivity {
 
         spinner.setAdapter(stringArrayAdapter);
 
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                categoryString = findCategory(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                categoryString = findCategory(0);
+            }
+        });
+
     } // Create Spinner
+
+    private String findCategory(int position) {
+
+        String strResult = null;
+
+        switch (inOutAnInt) {
+            case 0:
+                strResult = inComeStrings[position];
+                break;
+            case 1:
+                strResult = outComeStrings[position];
+                break;
+        }
+
+        return null;
+    }
 
     public void clickUpload(View view) {
 
+        amountString = editText.getText().toString().trim();
+
+        if (amountString.equals("")) {
+
+            MyAlert myAlert = new MyAlert();
+            myAlert.myDialog(this, "มีช่องว่าง", "ให้กริกจำนวนเงินด้วยค่ะ");
+
+        } else {
+
+            uploadValueToServer();
+
+        }
+
     } // ClickUpload
+
+    private void uploadValueToServer() {
+
+        Log.d("8June", "ID user ==> " + loginStrings[0]);
+        Log.d("8June", "Date ==> " + getIntent().getStringExtra("Date"));
+        Log.d("8June", "In _Out ==> " + inOutAnInt);
+        Log.d("8June", "Category ==> " + categoryString);
+        Log.d("8June", "amount ==> " + amountString);
+
+        OkHttpClient okHttpClient = new OkHttpClient();
+        RequestBody requestBody = new FormEncodingBuilder()
+                .add("isAdd", "true")
+                .add("id_user", loginStrings[0])
+                .add("Date", getIntent().getStringExtra("Date"))
+                .add("In_Out", Integer.toString(inOutAnInt))
+                .add("Category", categoryString)
+                .add("Amount", amountString)
+                .build();
+        Request.Builder builder = new Request.Builder();
+        Request request = builder.url("http://swiftcodingthai.com/pbru2/add_account_master.php")
+                .post(requestBody).build();
+        Call call = okHttpClient.newCall(request);
+        call.equals(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                finish();
+
+            }
+        });
+
+    }
 
     public void clickCancel(View view) {
         finish();
