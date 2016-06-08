@@ -4,25 +4,41 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
     // Explicit
     private MyManage myManage;
     private static final String urlJSON = "http://swiftcodingthai.com/pbru2/get_user_master.php";
+    private EditText userEditText, passwordEditText;
+    private String userString, passwordString;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Bind Widget
+        userEditText = (EditText) findViewById(R.id.editText5);
+        passwordEditText = (EditText) findViewById(R.id.editText6);
+
 
         myManage = new MyManage(this);
 
@@ -32,11 +48,34 @@ public class MainActivity extends AppCompatActivity {
         //Delete All SQLite
         deletAllSQLite();
 
+
         mySynJSON();
 
     }   // Main Method
 
-    private void mySynJSON(){
+    public void clickSignIn(View view) {
+
+        userString = userEditText.getText().toString().trim();
+        passwordString = passwordEditText.getText().toString().trim();
+
+        // Check Space
+        if (userString.equals("") || passwordString.equals("")) {
+            MyAlert myAlert = new MyAlert();
+            myAlert.myDialog(this, "Have Space", "Please Fill all Every Blank");
+        } else {
+            checkUserAndPassword();
+        }
+
+    }  // ClickSignIn
+
+    private void checkUserAndPassword() {
+
+
+
+    }
+
+
+    private void mySynJSON() {
         ConnectedUserTABLE connectedUserTABLE = new ConnectedUserTABLE(this);
         connectedUserTABLE.execute();
     }
@@ -47,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         private Context context;
         private ProgressDialog progressDialog;
 
-        public  ConnectedUserTABLE(Context context) {
+        public ConnectedUserTABLE(Context context) {
             this.context = context;
         }
 
@@ -88,6 +127,30 @@ public class MainActivity extends AppCompatActivity {
 
                 progressDialog.dismiss();
                 Log.d("7June", "JSON ==>" + s);
+
+                JSONArray jsonArray = new JSONArray(s);
+
+                String[] idStrings = new String[jsonArray.length()];
+                String[] nameStrings = new String[jsonArray.length()];
+                String[] surnameStrings = new String[jsonArray.length()];
+                String[] userStrings = new String[jsonArray.length()];
+                String[] passwordStrings = new String[jsonArray.length()];
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                    idStrings[i] = jsonObject.getString("id");
+                    nameStrings[i] = jsonObject.getString(MyManage.column_name);
+                    surnameStrings[i] = jsonObject.getString(MyManage.column_surname);
+                    userStrings[i] = jsonObject.getString(MyManage.column_user);
+                    passwordStrings[i] = jsonObject.getString(MyManage.column_password);
+
+                    myManage.addNewUser(idStrings[i], nameStrings[i],
+                            surnameStrings[i], userStrings[i], passwordStrings[i]);
+
+                } //for
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
